@@ -12,7 +12,7 @@ namespace BorderlandsDiscordRP.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,25 +25,37 @@ namespace BorderlandsDiscordRP.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string clientID {
+        [global::System.Configuration.DefaultSettingValueAttribute("769236005999476736")]
+        public string bl2ClientID {
             get {
-                return ((string)(this["clientID"]));
+                return ((string)(this["bl2ClientID"]));
             }
             set {
-                this["clientID"] = value;
+                this["bl2ClientID"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("30000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5000")]
         public double timeUpdate {
             get {
                 return ((double)(this["timeUpdate"]));
             }
             set {
                 this["timeUpdate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("769245048779833435")]
+        public string tpsClientId {
+            get {
+                return ((string)(this["tpsClientId"]));
+            }
+            set {
+                this["tpsClientId"] = value;
             }
         }
     }

@@ -2,11 +2,14 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BorderlandsDiscordRP.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="clientID" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="bl2ClientID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">769236005999476736</Value>
     </Setting>
     <Setting Name="timeUpdate" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">30000</Value>
+      <Value Profile="(Default)">5000</Value>
+    </Setting>
+    <Setting Name="tpsClientId" Type="System.String" Scope="User">
+      <Value Profile="(Default)">769245048779833435</Value>
     </Setting>
   </Settings>
 </SettingsFile>

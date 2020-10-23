@@ -25,7 +25,8 @@ namespace BorderlandsDiscordRP
         private static int discordPipe = -1;
 
         // The ID of the client using Discord RP.
-        private static string clientID = Settings.Default.clientID;
+        private static string bl2ClientID = Settings.Default.bl2ClientID;
+        private static string tpsClientID = Settings.Default.tpsClientId;
 
         // The double (in milliseconds) for how much we update
         private static double timeToUpdate = Settings.Default.timeUpdate;
@@ -49,10 +50,10 @@ namespace BorderlandsDiscordRP
         private static bool bl2 = true;
         private static bool tps = false;
 
-        private static string lastKnownMap = "Unknown";
-        private static string lastKnownMission = "Unknown";
+        private static string lastKnownMap = "The Borderlands";
+        private static string lastKnownMission = "In Menu";
         private static string lastKnownChar = "Unknown";
-        private static int lastKnownLevel = 1;
+        private static int lastKnownLevel = 0;
         #endregion
 
         #endregion
@@ -68,26 +69,14 @@ namespace BorderlandsDiscordRP
                 if (args[i] == "-pipe")
                     discordPipe = int.Parse(args[++i]);
             }
-            // If we just ran the program for the first time and our client ID is nothing
-            if (Settings.Default.clientID == "" || clientID == "")
-                updateClientID();
 
             setupClient();
             while (isRunning)
             {
                 Console.WriteLine(
-                    "Press C to change your client ID if need be.\n" +
-                    "Press T to change how much the program will update Discord\n" +
                     "Press ESC to close the program and stop rich presence.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-                if (keyInfo.Key == ConsoleKey.C)
-                    updateClientID();
-
-                else if (keyInfo.Key == ConsoleKey.T)
-                    updateTimer();
-
-                else if (keyInfo.Key == ConsoleKey.Escape)
+                if (keyInfo.Key == ConsoleKey.Escape)
                 {
                     // At the very end we need to dispose of our stuffs.
                     timer.Dispose();
@@ -99,39 +88,12 @@ namespace BorderlandsDiscordRP
         }
         #endregion
 
-        #region Updaters
-        private static void updateClientID()
-        {
-            Console.Clear();
-            Console.WriteLine("Please enter your Discord Rich Presence ID!");
-            Settings.Default.clientID = Console.ReadLine();
-            clientID = Settings.Default.clientID;
-            Settings.Default.Save();
-            setupClient();
-        }
-
-        private static void updateTimer()
-        {
-            bool validInput = false;
-            double timeSeconds = timeToUpdate;
-            while (!validInput)
-            {
-                Console.Clear();
-                Console.WriteLine("Please enter the time (in seconds (Default: 30 seconds))  Borderlands Rich Presence will update Discord:");
-                string time = Console.ReadLine();
-                validInput = double.TryParse(time, out timeSeconds);
-            }
-            timeToUpdate = TimeSpan.FromSeconds(timeSeconds).TotalMilliseconds;
-            Settings.Default.timeUpdate = timeToUpdate;
-            Settings.Default.Save();
-            Console.Clear();
-        }
-        #endregion
-
         #region Setup 
         private static void setupClient()
         {
             connected = false;
+
+            string clientID = tps ? tpsClientID : bl2ClientID;
 
             // Create a new client
             client = new DiscordRpcClient(clientID);
@@ -195,6 +157,9 @@ namespace BorderlandsDiscordRP
             // Change our timer interval just in case.
             timer.Interval = timeToUpdate;
 
+            bool lastKnownBl2 = bl2;
+            bool lastKnownTPS = tps;
+
             Process[] bl2Array = Process.GetProcesses().Where(p => p.ProcessName.Contains("Borderlands2")).ToArray();
             Process[] tpsArray = Process.GetProcesses().Where(p => p.ProcessName.Contains("BorderlandsPreSequel")).ToArray();
             bl2 = bl2Array.Length > 0;
@@ -205,7 +170,7 @@ namespace BorderlandsDiscordRP
             else if (tps)
                 launchDate = tpsArray.FirstOrDefault().StartTime;
 
-            client.Invoke();
+            //client.Invoke();
 
 
             if (!bl2 && !tps)
@@ -214,11 +179,18 @@ namespace BorderlandsDiscordRP
                 return;
             }
 
+            if(lastKnownBl2 != bl2 || lastKnownTPS != tps)
+            {
+                setupClient();
+            }
+
+            int level = getCurrentLevel();
+
             Dictionary<string, string> dict = obtainKeyBasedOnGame();
             RichPresence presence = new RichPresence()
             {
                 Details = getCurrentMission(),
-                State = string.Format("LVL {0} {1} - ({2} of 4)", getCurrentLevel(), getCurrentClass(), getPlayersInLobby()),
+                State = level > 0 ? string.Format("{1} {0} ({2} of 4)", level, getCurrentClass(), getPlayersInLobby()) : "",
                 Assets = new Assets()
                 {
                     LargeImageKey = dict.Keys.ElementAtOrDefault(0),
@@ -234,18 +206,8 @@ namespace BorderlandsDiscordRP
         #region Data Fetchers
         private static Dictionary<string, string> obtainKeyBasedOnGame()
         {
-            string key = "";
-            string keyTooltip = "";
-            if (bl2)
-            {
-                key = "bl2icon";
-                keyTooltip = "BL2";
-            }
-            else if (tps)
-            {
-                key = "tpsicon";
-                keyTooltip = "BL: TPS";
-            }
+            string key = "default";
+            string keyTooltip = "Main Menu";
             Dictionary<string, string> dict = new Dictionary<string, string>();
             dict.Add(key, keyTooltip);
             return dict;
@@ -274,6 +236,7 @@ namespace BorderlandsDiscordRP
                 pylon = ((BLObject)kvp.Value)?.Name;
             }
             mapName = mapFileToActualMap(pylon);
+            Console.WriteLine(mapName);
             if (mapName.Trim() == "" || mapName.Contains("Fake"))
                 mapName = lastKnownMap;
             else
@@ -291,7 +254,7 @@ namespace BorderlandsDiscordRP
             mission = dict.FirstOrDefault().Value?.ToString();
 
             if (mission == null || mission.Trim() == "")
-                mission = lastKnownMission;
+                mission = "In Menu";
             else
                 lastKnownMission = mission;
 
@@ -318,11 +281,10 @@ namespace BorderlandsDiscordRP
             KeyValuePair<BLObject, object>[] arr = dict.Where(m => m.Key.Name.Contains("Transient")).ToArray();
             string lev = dict.FirstOrDefault().Value?.ToString();
 
-            if (lev == null || lev.Trim() == "")
-                lev = lastKnownMission;
+            if (int.TryParse(lev, out int level) && level != 0)
+                lastKnownLevel = level;
             else
-                lastKnownMission = lev;
-            int.TryParse(lev, out int level);
+                level = lastKnownLevel;
             return level;
 
         }
@@ -368,14 +330,120 @@ namespace BorderlandsDiscordRP
 
         private static string mapFileToActualMap(string map)
         {
+            Console.WriteLine(map);
             if (map == null)
                 return "Unknown";
 
             map = map.ToLower(CultureInfo.InvariantCulture);
             if (bl2)
             {
+                #region DLC
+
+                #region Scarlett
+                if (map.Contains("orchid"))
+                {
+                    if (map.Contains("caves"))
+                        return "Hayter's Folly";
+                    if (map.Contains("wormbelly"))
+                        return "Leviathan's Lair";
+                    if (map.Contains("spire"))
+                        return "Magnys Lighthouse";
+                    if (map.Contains("oasistown"))
+                        return "Oasis";
+                    if (map.Contains("shipgraveyard"))
+                        return "The Rustyards";
+                    if (map.Contains("refinery"))
+                        return "Washburne Refinery";
+                    if (map.Contains("saltflats"))
+                        return "Wurmwater";
+                }
+                #endregion
+                #region Torgue
+                else if (map.Contains("iris"))
+                {
+                    if (map.Contains("dl1"))
+                        return "Torgue Arena";
+                    if (map.Contains("moxxi"))
+                        return "Badass Crater Bar";
+                    if (map.Contains("hub") && !map.Contains("hub2"))
+                        return "Badass Crater of Badassitude";
+                    if (map.Contains("dl2") && !map.Contains("interior"))
+                        return "The Beatdown";
+                    if (map.Contains("dl3"))
+                        return "The Forge";
+                    if (map.Contains("interior"))
+                        return @"Pyro Pete's Bar";
+                    if (map.Contains("hub2"))
+                        return "Southern Raceway";
+                }
+                #endregion
+                else if (map.Contains("sage"))
+                {
+                    if (map.Contains("powerstation"))
+                        return "Ardorton Station";
+                    if (map.Contains("cliffs"))
+                        return "Candlerakk's Crag";
+                    if (map.Contains("hyperionship"))
+                        return "H.S.S Terminus";
+                    if (map.Contains("underground"))
+                        return "Hunter's Grotto";
+                    if (map.Contains("rockforest"))
+                        return @"Scylla's Grove";
+                }
+                #region Tina
+                if (map.Contains("dark_forest"))
+                    return "Dark Forest";
+                if (map.Contains("castlekeep"))
+                    return "Dragon Keep";
+                if (map.Contains("village"))
+                    return "Flamerock Refuge";
+                if (map.Contains("castleexterior"))
+                    return @"Hatred's Shadow";
+                if (map.Contains("dead_forest"))
+                    return "Immortal Woods";
+                if (map.Contains("dungeon") && !map.Contains("raid"))
+                    return "Lair of Infinite Agony";
+                if (map.Contains("raid"))
+                    return "The Winged Storm";
+                if (map.Contains("mines"))
+                    return "Mines of Avarice";
+                if (map.Contains("templeslaughter"))
+                    return @"Murderlin's Temple";
+                if (map.Contains("docks"))
+                    return "Unassuming Docks";
+                #endregion Tina
+                #region Headhunters
+                if (map.Contains("hunger"))
+                    return "Gluttony Gulch";
+                if (map.Contains("pumpkin"))
+                    return "Hallowed Hallow";
+                if (map.Contains("xmas"))
+                    return @"Marcus's Mercenary Shop";
+                if (map.Contains("testingzone"))
+                    return "Digistruct Peak";
+                if (map.Contains("distillery"))
+                    return "Rotgut Distillery";
+                if (map.Contains("easter"))
+                    return "Wam Bam Island";
+                #endregion
+                #region Lilith
+                if (map.Contains("sanctintro"))
+                    return "Sanctuary";
+                if (map.Contains("backburner"))
+                    return "The Backburner";
+                if (map.Contains("olddust"))
+                    return "Dahl Abandon";
+                if (map.Contains("sandworm"))
+                    return "The Burrows";
+                if (map.Contains("helios_hangar"))
+                    return "Helios Fallen";
+                if (map.Contains("researchcenter"))
+                    return "Mt. Scarab Research Center";
+                #endregion
+                #endregion
+
                 if (map.Contains("menumap"))
-                    return "Main Menu";
+                    return "In Menu";
                 if (map.Contains("stockade"))
                     return "Arid Nexus - Badlands";
                 if (map.Contains("fyrestone"))
@@ -446,92 +514,6 @@ namespace BorderlandsDiscordRP
                     return "Wildlife Exploitation Preserve";
                 if (map.Contains("glacial"))
                     return "Windshear Waste";
-                #region DLC
-
-                if (map.Contains("orchid"))
-                {
-                    if (map.Contains("caves"))
-                        return "Hayter's Folly";
-                    if (map.Contains("wormbelly"))
-                        return "Leviathan's Lair";
-                    if (map.Contains("spire"))
-                        return "Magnys Lighthouse";
-                    if (map.Contains("oasistown"))
-                        return "Oasis";
-                    if (map.Contains("shipgraveyard"))
-                        return "The Rustyards";
-                    if (map.Contains("refinery"))
-                        return "Washburne Refinery";
-                    if (map.Contains("saltflats"))
-                        return "Wurmwater";
-                }
-                else if (map.Contains("iris"))
-                {
-                    if (map.Contains("dl1"))
-                        return "Torgue Arena";
-                    if (map.Contains("moxxi"))
-                        return "Badass Crater Bar";
-                    if (map.Contains("hub") && !map.Contains("hub2"))
-                        return "Badass Crater of Badassitude";
-                    if (map.Contains("dl2") && !map.Contains("interior"))
-                        return "The Beatdown";
-                    if (map.Contains("dl3"))
-                        return "The Forge";
-                    if (map.Contains("interior"))
-                        return @"Pyro Pete's Bar";
-                    if (map.Contains("hub2"))
-                        return "Southern Raceway";
-                }
-                else if (map.Contains("sage"))
-                {
-                    if (map.Contains("powerstation"))
-                        return "Ardorton Station";
-                    if (map.Contains("cliffs"))
-                        return "Candlerakk's Crag";
-                    if (map.Contains("hyperionship"))
-                        return "H.S.S Terminus";
-                    if (map.Contains("underground"))
-                        return "Hunter's Grotto";
-                    if (map.Contains("rockforest"))
-                        return @"Scylla's Grove";
-                }
-
-                if (map.Contains("dark_forest"))
-                    return "Dark Forest";
-                if (map.Contains("castlekeep"))
-                    return "Dragon Keep";
-                if (map.Contains("village"))
-                    return "Flamerock Refuge";
-                if (map.Contains("castleexterior"))
-                    return @"Hatred's Shadow";
-                if (map.Contains("dead_forest"))
-                    return "Immortal Woods";
-                if (map.Contains("dungeon") && !map.Contains("raid"))
-                    return "Lair of Infinite Agony";
-                if (map.Contains("raid"))
-                    return "The Winged Storm";
-                if (map.Contains("mines"))
-                    return "Mines of Avarice";
-                if (map.Contains("templeslaughter"))
-                    return @"Murderlin's Temple";
-                if (map.Contains("docks"))
-                    return "Unassuming Docks";
-
-                if (map.Contains("hunger"))
-                    return "Gluttony Gulch";
-                if (map.Contains("pumpkin"))
-                    return "Hallowed Hallow";
-                if (map.Contains("xmas"))
-                    return @"Marcus's Mercenary Shop";
-                if (map.Contains("testingzone"))
-                    return "Raid on Digistruct Peak";
-                if (map.Contains("distillery"))
-                    return "Rotgut Distillery";
-                if (map.Contains("easter"))
-                    return "Wam Bam Island";
-
-
-                #endregion
             }
             else if (tps)
             {
