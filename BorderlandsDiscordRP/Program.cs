@@ -9,6 +9,7 @@ using BorderlandsDiscordRP.Properties;
 using DiscordRPC;
 using DiscordRPC.Logging;
 using static BLIO;
+using System.Text.RegularExpressions;
 
 namespace BorderlandsDiscordRP
 {
@@ -185,16 +186,16 @@ namespace BorderlandsDiscordRP
             }
 
             int level = getCurrentLevel();
+            string map = getCurrentMap();
 
-            Dictionary<string, string> dict = obtainKeyBasedOnGame();
             RichPresence presence = new RichPresence()
             {
                 Details = getCurrentMission(),
                 State = level > 0 ? string.Format("{1} {0} ({2} of 4)", level, getCurrentClass(), getPlayersInLobby()) : "",
                 Assets = new Assets()
                 {
-                    LargeImageKey = dict.Keys.ElementAtOrDefault(0),
-                    LargeImageText = "Map: " + getCurrentMap()
+                    LargeImageKey = Regex.Replace(map, @"[ '.\-,]", "").ToLower(),
+                    LargeImageText = map
                 },
                 Timestamps = new Timestamps(launchDate.ToUniversalTime())
             };
@@ -204,15 +205,6 @@ namespace BorderlandsDiscordRP
         #endregion
 
         #region Data Fetchers
-        private static Dictionary<string, string> obtainKeyBasedOnGame()
-        {
-            string key = "default";
-            string keyTooltip = "Main Menu";
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            dict.Add(key, keyTooltip);
-            return dict;
-        }
-
         private static int getPlayersInLobby()
         {
             int characters = 1;
@@ -237,7 +229,7 @@ namespace BorderlandsDiscordRP
             }
             mapName = mapFileToActualMap(pylon);
             Console.WriteLine(mapName);
-            if (mapName.Trim() == "" || mapName.Contains("Fake"))
+            if (mapName.Trim() == "" || pylon.Contains("Fake"))
                 mapName = lastKnownMap;
             else
                 lastKnownMap = mapName;
@@ -416,7 +408,7 @@ namespace BorderlandsDiscordRP
                 if (map.Contains("hunger"))
                     return "Gluttony Gulch";
                 if (map.Contains("pumpkin"))
-                    return "Hallowed Hallow";
+                    return "Hallowed Hollow";
                 if (map.Contains("xmas"))
                     return @"Marcus's Mercenary Shop";
                 if (map.Contains("testingzone"))
@@ -433,7 +425,7 @@ namespace BorderlandsDiscordRP
                     return "The Backburner";
                 if (map.Contains("olddust"))
                     return "Dahl Abandon";
-                if (map.Contains("sandworm"))
+                if (map.Contains("sandworm") || map.Contains("writhing"))
                     return "The Burrows";
                 if (map.Contains("helios_hangar"))
                     return "Helios Fallen";
@@ -455,7 +447,7 @@ namespace BorderlandsDiscordRP
                 if (map.Contains("frost"))
                     return "Three Horns Valley";
                 if (map.Contains("boss_cliffs"))
-                    return "Bunker";
+                    return "The Bunker";
                 if (map.Contains("caverns"))
                     return "Caustic Caverns";
                 if (map.Contains("vogchamber"))
@@ -484,8 +476,6 @@ namespace BorderlandsDiscordRP
                     return "Holy Spirits";
                 if (map.Contains("grass"))
                     return "Lynchwood";
-                if (map.Contains("creatureslaughter"))
-                    return "Natural Selection Annex";
                 if (map.Contains("hyperioncity"))
                     return "Opportunity";
                 if (map.Contains("robotslaughter"))
@@ -510,7 +500,7 @@ namespace BorderlandsDiscordRP
                     return "Tundra Express";
                 if (map.Contains("boss_volcano"))
                     return "Vault of the Warrior";
-                if (map.Contains("pandorapark"))
+                if (map.Contains("pandorapark") || map.Contains("creatureslaughter"))
                     return "Wildlife Exploitation Preserve";
                 if (map.Contains("glacial"))
                     return "Windshear Waste";
