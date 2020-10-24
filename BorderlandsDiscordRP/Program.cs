@@ -31,8 +31,6 @@ namespace BorderlandsDiscordRP
                 Console.SetOut(standardOutput);
             }
 
-            File.WriteAllText("C:\\Users\\Sumner\\Desktop\\text.txt", "foo");
-
             Integration.Create();
         }
     }
