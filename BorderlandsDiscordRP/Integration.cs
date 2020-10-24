@@ -84,6 +84,7 @@ namespace BorderlandsDiscordRP
             var process = Process.Start(Path.Combine(dir, game));
             setupClient();
             process.WaitForExit();
+            client.ClearPresence();
 
             return 0;
         }
@@ -175,8 +176,10 @@ namespace BorderlandsDiscordRP
                 State = level > 0 ? string.Format("{1} {0} ({2} of 4)", level, getCurrentClass(), getPlayersInLobby()) : "",
                 Assets = new Assets()
                 {
-                    LargeImageKey = Regex.Replace(map, @"[ '.\-,]", "").ToLower(),
-                    LargeImageText = map
+                    LargeImageKey = Regex.Replace(map, @"[ '.\-,/]", "").ToLower(),
+                    LargeImageText = map,
+                    SmallImageKey = "default",
+                    SmallImageText = bl2 ? "Borderlands 2" : "Borderlands: The Pre-Sequel"
                 },
                 Timestamps = new Timestamps(launchDate.ToUniversalTime())
             };
@@ -486,10 +489,26 @@ namespace BorderlandsDiscordRP
             }
             else if (tps)
             {
-                if (map.Contains("moonslaughter"))
-                    return "Abandoned Training Facility";
+                if (map.Contains("ma_"))
+                {
+                    if (map.Contains("leftcluster"))
+                        return "Cluster 00773 P4ND0R4";
+                    if (map.Contains("rightcluster"))
+                        return "Cluster 99002 0V3RL00K";
+                    if (map.Contains("subboss"))
+                        return "Cortex";
+                    if (map.Contains("deck13") || map.Contains("finalboss"))
+                        return "Deck 13 1/2";
+                    if (map.Contains("motherboard"))
+                        return "Motherless Board";
+                    if (map.Contains("Nexus"))
+                        return "The Nexus";
+                    if (map.Contains("subconscious"))
+                        return "Subconscious";
+                }
+
                 if (map.Contains("spaceport"))
-                    return "Concorida";
+                    return "Concordia";
                 if (map.Contains("comfacility"))
                     return "Crisis Scar";
                 if (map.Contains("innercore"))
@@ -498,6 +517,8 @@ namespace BorderlandsDiscordRP
                     return "Eye of Helios";
                 if (map.Contains("moonshotintro"))
                     return "Helios Station";
+                if (map.Contains("centralterminal"))
+                    return "Hyperion Hub of Heroism";
                 if (map.Contains("jacksoffice"))
                     return @"Jack's Office";
                 if (map.Contains("laser"))
@@ -506,7 +527,7 @@ namespace BorderlandsDiscordRP
                     return @"Meriff's Office";
                 if (map.Contains("digsite_rk5"))
                     return "Outfall Pumping Station";
-                if (map.Contains("outlands_p2"))
+                if (map.Contains("outlands_combat2"))
                     return "Outlands Canyon";
                 if (map.Contains("outlands"))
                     return "Outlands Spur";
@@ -535,24 +556,8 @@ namespace BorderlandsDiscordRP
                 if (map.Contains("digsite"))
                     return "Vorago Solitude";
 
-                if (map.Contains("ma_"))
-                {
-                    if (map.Contains("leftcluster"))
-                        return "Cluster 007733 P4ND0R4";
-                    if (map.Contains("rightcluster"))
-                        return "Cluster 99002 0V3RL00K";
-                    if (map.Contains("subboss"))
-                        return "Cortex";
-                    if (map.Contains("deck13"))
-                        return "Deck 13 1/2";
-                    if (map.Contains("finalboss"))
-                        return "Deck 13.5";
-                    if (map.Contains("motherboard"))
-                        return "Motherless Board";
-                    if (map.Contains("subconscious"))
-                        return "Subconscious";
-                }
-
+                if (map.Contains("moonslaughter"))
+                    return "Abandoned Training Facility";
                 if (map.Contains("eridian_slaughter"))
                     return "The Holodome";
             }
