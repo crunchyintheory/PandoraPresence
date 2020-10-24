@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1E88F840-A262-46B1-9E1B-DC8F81E10B12}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>BorderlandsDiscordRP</RootNamespace>
     <AssemblyName>BorderlandsDiscordRP</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -37,12 +37,15 @@
     <ApplicationIcon>Launcher.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DiscordRPC, Version=1.0.150.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DiscordRichPresence.1.0.150\lib\net35\DiscordRPC.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BLIO.cs" />
+    <Compile Include="Integration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -95,7 +99,7 @@
       <MergeAsm Include="$(OutputPath)Newtonsoft.Json.dll" />
     </ItemGroup>
     <PropertyGroup>
-      <MergedAssembly>$(ProjectDir)$(OutDir)BorderlandsDiscordRPMerged.exe</MergedAssembly>
+      <MergedAssembly>$(ProjectDir)$(OutDir)Launcher.exe</MergedAssembly>
     </PropertyGroup>
     <Message Text="ILMerge @(MergeAsm) -&gt; $(MergedAssembly)" Importance="high" />
     <ILMerge InputAssemblies="@(MergeAsm)" OutputFile="$(MergedAssembly)" TargetKind="SameAsPrimaryAssembly" />

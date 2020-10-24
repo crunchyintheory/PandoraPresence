@@ -36,13 +36,9 @@ Installation
 	  1. Quit the game if running.
 	  2. [Download the latest version of `ddraw.dll`/PluginLoader).](https://github.com/c0dycode/BorderlandsPluginLoader/releases)
 	  3. Locate the `Win32` folder within your game's `Binaries` folder. ![Win32 folder](https://i.imgur.com/t6OI06l.png)
-	  4. Copy `ddraw.dll` to the `Win32` folder. ![ddrawl.dll](https://i.imgur.com/FHfiSqg.png)	  
+	  4. Copy `ddraw.dll` **and `Launcher.exe`** to the `Win32` folder. ![ddraw.dll](https://i.imgur.com/FHfiSqg.png) ![Launcher.exe](https://i.imgur.com/ydzBruZ.png)
 	  5. In the `Win32` folder, create a folder called `Plugins`. ![Plugins folder](https://i.imgur.com/CDdoKDs.png)
 	  6. [Download the latest version of CommandInjector.](https://github.com/c0dycode/BL-CommandInjector/blob/master/CommandInjector.zip)
-	  7. Open the `CommandInjector.zip` file to view its contents. ![CommandInjector.zip](https://i.imgur.com/r1I3b26.png)
-	  8. Copy `CommandInjector.dll` (If you're installing it for BL2) or `CommandInjectorTPS.dll` (If you're installing it for TPS) to the `Plugins` folder you created. ![CommandInjector.dll](https://i.imgur.com/U9OSqcV.png)
-3. Borderlands RP Setup
-      1. Run Borderlands RP if you haven't already.
-	  2. Discord Rich Presence will now connect to Discord.
-
-	  * If you press `ESC`, You'll close the program.
+	  7. Open the `CommandInjector.zip` file to view its contents. ![CommandInjector.zip](https://i.imgur.com/xjTdT70.png)
+	  8. Copy `CommandInjector-UHD.dll` (If you're installing it for BL2) or `CommandInjectorTPS-UHD.dll` (If you're installing it for TPS) to the `Plugins` folder you created. ![CommandInjector.dll](https://i.imgur.com/mMHraRu.png)
+3. Run the game, and Borderlands RP will automatically start and stop with the game.
