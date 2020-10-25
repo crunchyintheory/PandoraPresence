@@ -320,7 +320,7 @@ namespace BorderlandsDiscordRP
                 #region Scarlett
                 if (map.StartsWith("orchid"))
                 {
-                    map = map.Substring(6);
+                    map = map.Substring(7);
                     if (map.StartsWith("caves"))
                         return "Hayter's Folly";
                     if (map.StartsWith("wormbelly"))
@@ -340,21 +340,23 @@ namespace BorderlandsDiscordRP
                 #region Torgue
                 else if (map.StartsWith("iris"))
                 {
-                    map = map.Substring(4);
-                    if (map.Contains("dl1"))
+                    map = map.Substring(5);
+                    if (map.StartsWith("dl1"))
                         return "Torgue Arena";
-                    if (map.Contains("moxxi"))
+                    if (map.StartsWith("moxxi"))
                         return "Badass Crater Bar";
-                    if (map.Contains("hub") && !map.Contains("hub2"))
+                    if (map.StartsWith("hub")) {
+                        if (map[3] == '2')
+                            return "Southern Raceway";
                         return "Badass Crater of Badassitude";
-                    if (map.Contains("dl2") && !map.Contains("interior"))
+                    }
+                    if (map.StartsWith("dl2")) {
+                        if (map.Contains("interior"))
+                            return @"Pyro Pete's Bar";
                         return "The Beatdown";
+                    }
                     if (map.Contains("dl3"))
                         return "The Forge";
-                    if (map.Contains("interior"))
-                        return @"Pyro Pete's Bar";
-                    if (map.Contains("hub2"))
-                        return "Southern Raceway";
                 }
                 #endregion
                 else if (map.StartsWith("sage"))
@@ -381,7 +383,7 @@ namespace BorderlandsDiscordRP
                     return @"Hatred's Shadow";
                 if (map.Contains("dead_forest"))
                     return "Immortal Woods";
-                if (map.Contains("dungeon") && !map.Contains("raid"))
+                if (map.StartsWith("dungeon") && !map.Contains("raid"))
                     return "Lair of Infinite Agony";
                 if (map.Contains("raid") && !map.Contains("thresher"))
                     return "The Winged Storm";
