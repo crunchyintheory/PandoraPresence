@@ -78,13 +78,17 @@ namespace BorderlandsDiscordRP
             }
             else
             {
-                return 1;
+                //return 1;
             }
 
-            var process = Process.Start(Path.Combine(dir, game));
+            //var process = Process.Start(Path.Combine(dir, game));
             setupClient();
-            process.WaitForExit();
+            //process.WaitForExit();
             client.ClearPresence();
+
+            //Testing Code
+            ManualResetEvent Wait = new ManualResetEvent(false);
+            Wait.WaitOne();
 
             return 0;
         }
@@ -307,34 +311,36 @@ namespace BorderlandsDiscordRP
         {
             if (map == null)
                 return "Unknown";
-
+            Console.WriteLine(map);
             map = map.ToLower(CultureInfo.InvariantCulture);
             if (bl2)
             {
                 #region DLC
 
                 #region Scarlett
-                if (map.Contains("orchid"))
+                if (map.StartsWith("orchid"))
                 {
-                    if (map.Contains("caves"))
+                    map = map.Substring(6);
+                    if (map.StartsWith("caves"))
                         return "Hayter's Folly";
-                    if (map.Contains("wormbelly"))
+                    if (map.StartsWith("wormbelly"))
                         return "Leviathan's Lair";
-                    if (map.Contains("spire"))
+                    if (map.StartsWith("spire"))
                         return "Magnys Lighthouse";
-                    if (map.Contains("oasistown"))
+                    if (map.StartsWith("oasistown"))
                         return "Oasis";
-                    if (map.Contains("shipgraveyard"))
+                    if (map.StartsWith("shipgraveyard"))
                         return "The Rustyards";
-                    if (map.Contains("refinery"))
+                    if (map.StartsWith("refinery"))
                         return "Washburne Refinery";
-                    if (map.Contains("saltflats"))
+                    if (map.StartsWith("saltflats"))
                         return "Wurmwater";
                 }
                 #endregion
                 #region Torgue
-                else if (map.Contains("iris"))
+                else if (map.StartsWith("iris"))
                 {
+                    map = map.Substring(4);
                     if (map.Contains("dl1"))
                         return "Torgue Arena";
                     if (map.Contains("moxxi"))
@@ -351,7 +357,7 @@ namespace BorderlandsDiscordRP
                         return "Southern Raceway";
                 }
                 #endregion
-                else if (map.Contains("sage"))
+                else if (map.StartsWith("sage"))
                 {
                     if (map.Contains("powerstation"))
                         return "Ardorton Station";
@@ -377,7 +383,7 @@ namespace BorderlandsDiscordRP
                     return "Immortal Woods";
                 if (map.Contains("dungeon") && !map.Contains("raid"))
                     return "Lair of Infinite Agony";
-                if (map.Contains("raid"))
+                if (map.Contains("raid") && !map.Contains("thresher"))
                     return "The Winged Storm";
                 if (map.Contains("mines"))
                     return "Mines of Avarice";
@@ -418,46 +424,52 @@ namespace BorderlandsDiscordRP
 
                 if (map.Contains("menumap"))
                     return "In Menu";
-                if (map.Contains("stockade"))
+                if (map.StartsWith("stockade"))
                     return "Arid Nexus - Badlands";
-                if (map.Contains("fyrestone"))
+                if (map.StartsWith("fyrestone"))
                     return "Arid Nexus - Boneyard";
-                if (map.Contains("damtop"))
-                    return "Bloodshot Ramparts";
-                if (map.Contains("dam") && !map.Contains("damtop"))
+                if (map.StartsWith("dam"))
+                {
+                    if (map.Contains("damtop"))
+                        return "Bloodshot Ramparts";
                     return "Bloodshot Stronghold";
-                if (map.Contains("frost"))
+                }
+                if (map.StartsWith("frost"))
                     return "Three Horns Valley";
                 if (map.Contains("boss_cliffs"))
                     return "The Bunker";
-                if (map.Contains("caverns"))
+                if (map.StartsWith("caverns"))
                     return "Caustic Caverns";
                 if (map.Contains("vogchamber"))
                     return "Control Core Angel";
-                if (map.Contains("interlude"))
+                if (map.StartsWith("interlude"))
                     return "The Dust";
                 if (map.Contains("tundratrain"))
                     return "End of the Line";
-                if (map.Contains("ash"))
+                if (map.StartsWith("ash"))
                     return "Eridium Blight";
-                if (map.Contains("banditslaughter"))
+                if (map.StartsWith("banditslaughter"))
                     return "Fink's Slaughterhouse";
-                if (map.Contains("fridge"))
+                if (map.StartsWith("fridge"))
                     return "The Fridge";
-                if (map.Contains("hypinterlude"))
+                if (map.StartsWith("hypinterlude"))
                     return "Friendship Gulag";
                 if (map.Contains("icecanyon"))
                     return "Frostburn Canyon";
                 if (map.Contains("finalbossascent"))
                     return @"Hero's Pass";
-                if (map.Contains("outwash"))
+                if (map.StartsWith("outwash"))
                     return "Highlands Outwash";
-                if (map.Contains("grass") && !map.Contains("lynchwood"))
+                if (map.StartsWith("grass"))
+                {
+                    if (map.Contains("lynchwood"))
+                        return "Lynchwood";
+                    if (map.Contains("cliffs"))
+                        return "Thousand Cuts";
                     return "Highlands";
+                }
                 if (map.Contains("luckys"))
                     return "Holy Spirits";
-                if (map.Contains("grass"))
-                    return "Lynchwood";
                 if (map.Contains("hyperioncity"))
                     return "Opportunity";
                 if (map.Contains("robotslaughter"))
@@ -468,13 +480,13 @@ namespace BorderlandsDiscordRP
                     return "Sanctuary Hole";
                 if (map.Contains("craterlake"))
                     return "Sawtooth Cauldron";
-                if (map.Contains("cove"))
+                if (map.Contains("cove_"))
                     return "Southern Shelf - Bay";
                 if (map.Contains("southernshelf"))
                     return "Southern Shelf";
                 if (map.Contains("Southpaw Factory"))
                     return "Southpaw Steam + Power";
-                if (map.Contains("thresherraid"))
+                if (map.StartsWith("thresherraid"))
                     return "Terramorphous Peak";
                 if (map.Contains("ice"))
                     return "Three Horns Divide";
