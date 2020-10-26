@@ -78,17 +78,17 @@ namespace BorderlandsDiscordRP
             }
             else
             {
-                //return 1;
+                return 1;
             }
 
-            //var process = Process.Start(Path.Combine(dir, game));
+            var process = Process.Start(Path.Combine(dir, game));
             setupClient();
-            //process.WaitForExit();
+            process.WaitForExit();
             client.ClearPresence();
 
             //Testing Code
-            ManualResetEvent Wait = new ManualResetEvent(false);
-            Wait.WaitOne();
+            //ManualResetEvent Wait = new ManualResetEvent(false);
+            //Wait.WaitOne();
 
             return 0;
         }
