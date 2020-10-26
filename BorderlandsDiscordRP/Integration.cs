@@ -311,7 +311,6 @@ namespace BorderlandsDiscordRP
         {
             if (map == null)
                 return "Unknown";
-            Console.WriteLine(map);
             map = map.ToLower(CultureInfo.InvariantCulture);
             if (bl2)
             {
@@ -355,76 +354,82 @@ namespace BorderlandsDiscordRP
                             return @"Pyro Pete's Bar";
                         return "The Beatdown";
                     }
-                    if (map.Contains("dl3"))
+                    if (map.StartsWith("dl3"))
                         return "The Forge";
                 }
                 #endregion
+                #region Hammerlock
                 else if (map.StartsWith("sage"))
                 {
-                    if (map.Contains("powerstation"))
+                    map = map.Substring(5);
+                    if (map.StartsWith("powerstation"))
                         return "Ardorton Station";
-                    if (map.Contains("cliffs"))
+                    if (map.StartsWith("cliffs"))
                         return "Candlerakk's Crag";
-                    if (map.Contains("hyperionship"))
+                    if (map.StartsWith("hyperionship"))
                         return "H.S.S Terminus";
-                    if (map.Contains("underground"))
+                    if (map.StartsWith("underground"))
                         return "Hunter's Grotto";
-                    if (map.Contains("rockforest"))
+                    if (map.StartsWith("rockforest"))
                         return @"Scylla's Grove";
                 }
+                #endregion
                 #region Tina
-                if (map.Contains("dark_forest"))
-                    return "Dark Forest";
-                if (map.Contains("castlekeep"))
-                    return "Dragon Keep";
-                if (map.Contains("village"))
-                    return "Flamerock Refuge";
-                if (map.Contains("castleexterior"))
+                if (map.StartsWith("castleexterior"))
                     return @"Hatred's Shadow";
-                if (map.Contains("dead_forest"))
+                if (map.StartsWith("castlekeep"))
+                    return "Dragon Keep";
+                if (map.StartsWith("dark_forest"))
+                    return "Dark Forest";
+                if (map.StartsWith("dead_forest"))
                     return "Immortal Woods";
-                if (map.StartsWith("dungeon") && !map.Contains("raid"))
-                    return "Lair of Infinite Agony";
-                if (map.Contains("raid") && !map.Contains("thresher"))
-                    return "The Winged Storm";
-                if (map.Contains("mines"))
-                    return "Mines of Avarice";
-                if (map.Contains("templeslaughter"))
-                    return @"Murderlin's Temple";
-                if (map.Contains("docks"))
+                if (map.StartsWith("docks"))
                     return "Unassuming Docks";
+                if (map.StartsWith("dungeon"))
+                {
+                    if(map.Contains("raid"))
+                        return "The Winged Storm";
+                    
+                    return "Lair of Infinite Agony";
+                }
+                if (map.StartsWith("mines"))
+                    return "Mines of Avarice";
+                if (map.StartsWith("templeslaughter"))
+                    return @"Murderlin's Temple";
+                if (map.StartsWith("village"))
+                    return "Flamerock Refuge";
                 #endregion Tina
                 #region Headhunters
-                if (map.Contains("hunger"))
+                if (map.StartsWith("hunger"))
                     return "Gluttony Gulch";
-                if (map.Contains("pumpkin"))
+                if (map.StartsWith("pumpkin"))
                     return "Hallowed Hollow";
-                if (map.Contains("xmas"))
+                if (map.StartsWith("xmas"))
                     return @"Marcus's Mercenary Shop";
-                if (map.Contains("testingzone"))
+                if (map.StartsWith("testingzone"))
                     return "Digistruct Peak";
-                if (map.Contains("distillery"))
+                if (map.StartsWith("distillery"))
                     return "Rotgut Distillery";
-                if (map.Contains("easter"))
+                if (map.StartsWith("easter"))
                     return "Wam Bam Island";
                 #endregion
                 #region Lilith
-                if (map.Contains("sanctintro"))
+                if (map.StartsWith("sanctintro"))
                     return "Sanctuary";
-                if (map.Contains("backburner"))
+                if (map.StartsWith("backburner"))
                     return "The Backburner";
-                if (map.Contains("olddust"))
+                if (map.StartsWith("olddust"))
                     return "Dahl Abandon";
-                if (map.Contains("sandworm") || map.Contains("writhing"))
+                if (map.StartsWith("sandworm") || map.StartsWith("writhing"))
                     return "The Burrows";
-                if (map.Contains("helios_hangar"))
+                if (map.StartsWith("helios_hangar"))
                     return "Helios Fallen";
-                if (map.Contains("researchcenter"))
+                if (map.StartsWith("researchcenter"))
                     return "Mt. Scarab Research Center";
                 #endregion
                 #endregion
 
-                if (map.Contains("menumap"))
+                if (map.StartsWith("menumap"))
                     return "In Menu";
                 if (map.StartsWith("stockade"))
                     return "Arid Nexus - Badlands";
@@ -432,21 +437,21 @@ namespace BorderlandsDiscordRP
                     return "Arid Nexus - Boneyard";
                 if (map.StartsWith("dam"))
                 {
-                    if (map.Contains("damtop"))
+                    if (map.StartsWith("damtop"))
                         return "Bloodshot Ramparts";
                     return "Bloodshot Stronghold";
                 }
                 if (map.StartsWith("frost"))
                     return "Three Horns Valley";
-                if (map.Contains("boss_cliffs"))
+                if (map.StartsWith("boss_cliffs"))
                     return "The Bunker";
                 if (map.StartsWith("caverns"))
                     return "Caustic Caverns";
-                if (map.Contains("vogchamber"))
+                if (map.StartsWith("vogchamber"))
                     return "Control Core Angel";
                 if (map.StartsWith("interlude"))
                     return "The Dust";
-                if (map.Contains("tundratrain"))
+                if (map.StartsWith("tundratrain"))
                     return "End of the Line";
                 if (map.StartsWith("ash"))
                     return "Eridium Blight";
@@ -456,9 +461,9 @@ namespace BorderlandsDiscordRP
                     return "The Fridge";
                 if (map.StartsWith("hypinterlude"))
                     return "Friendship Gulag";
-                if (map.Contains("icecanyon"))
+                if (map.StartsWith("icecanyon"))
                     return "Frostburn Canyon";
-                if (map.Contains("finalbossascent"))
+                if (map.StartsWith("finalbossascent"))
                     return @"Hero's Pass";
                 if (map.StartsWith("outwash"))
                     return "Highlands Outwash";
@@ -470,109 +475,112 @@ namespace BorderlandsDiscordRP
                         return "Thousand Cuts";
                     return "Highlands";
                 }
-                if (map.Contains("luckys"))
+                if (map.StartsWith("luckys"))
                     return "Holy Spirits";
-                if (map.Contains("hyperioncity"))
+                if (map.StartsWith("hyperioncity"))
                     return "Opportunity";
-                if (map.Contains("robotslaughter"))
+                if (map.StartsWith("robotslaughter"))
                     return "Ore Chasm";
-                if (map.Contains("sanctuary") && !map.Contains("hole"))
+                if (map.StartsWith("sanctuary") && !map.Contains("hole"))
                     return "Sanctuary";
-                if (map.Contains("sanctuary_hole"))
+                if (map.StartsWith("sanctuary_hole"))
                     return "Sanctuary Hole";
-                if (map.Contains("craterlake"))
+                if (map.StartsWith("craterlake"))
                     return "Sawtooth Cauldron";
-                if (map.Contains("cove_"))
+                if (map.StartsWith("cove_"))
                     return "Southern Shelf - Bay";
-                if (map.Contains("southernshelf"))
+                if (map.StartsWith("southernshelf"))
                     return "Southern Shelf";
-                if (map.Contains("Southpaw Factory"))
+                if (map.StartsWith("southpawfactory"))
                     return "Southpaw Steam + Power";
                 if (map.StartsWith("thresherraid"))
                     return "Terramorphous Peak";
-                if (map.Contains("ice"))
+                if (map.StartsWith("ice"))
                     return "Three Horns Divide";
-                if (map.Contains("tundraexpress"))
+                if (map.StartsWith("tundraexpress"))
                     return "Tundra Express";
-                if (map.Contains("boss_volcano"))
+                if (map.StartsWith("boss_volcano"))
                     return "Vault of the Warrior";
-                if (map.Contains("pandorapark") || map.Contains("creatureslaughter"))
+                if (map.StartsWith("pandorapark") || map.StartsWith("creatureslaughter"))
                     return "Wildlife Exploitation Preserve";
-                if (map.Contains("glacial"))
+                if (map.StartsWith("glacial"))
                     return "Windshear Waste";
             }
             else if (tps)
             {
-                if (map.Contains("ma_"))
+                if (map.StartsWith("ma_"))
                 {
-                    if (map.Contains("leftcluster"))
+                    map = map.Substring(3);
+                    if (map.StartsWith("leftcluster"))
                         return "Cluster 00773 P4ND0R4";
-                    if (map.Contains("rightcluster"))
+                    if (map.StartsWith("rightcluster"))
                         return "Cluster 99002 0V3RL00K";
-                    if (map.Contains("subboss"))
+                    if (map.StartsWith("subboss"))
                         return "Cortex";
-                    if (map.Contains("deck13") || map.Contains("finalboss"))
+                    if (map.StartsWith("deck13") || map.StartsWith("finalboss"))
                         return "Deck 13 1/2";
-                    if (map.Contains("motherboard"))
+                    if (map.StartsWith("motherboard"))
                         return "Motherless Board";
-                    if (map.Contains("Nexus"))
+                    if (map.StartsWith("Nexus"))
                         return "The Nexus";
-                    if (map.Contains("subconscious"))
+                    if (map.StartsWith("subconscious"))
                         return "Subconscious";
                 }
 
-                if (map.Contains("spaceport"))
+                if (map.StartsWith("spaceport"))
                     return "Concordia";
-                if (map.Contains("comfacility"))
+                if (map.StartsWith("comfacility"))
                     return "Crisis Scar";
-                if (map.Contains("innercore"))
+                if (map.StartsWith("innercore"))
                     return "Eleseer";
-                if (map.Contains("laserboss"))
+                if (map.StartsWith("laserboss"))
                     return "Eye of Helios";
-                if (map.Contains("moonshotintro"))
+                if (map.StartsWith("moonshotintro"))
                     return "Helios Station";
-                if (map.Contains("centralterminal"))
+                if (map.StartsWith("centralterminal"))
                     return "Hyperion Hub of Heroism";
-                if (map.Contains("jacksoffice"))
+                if (map.StartsWith("jacksoffice"))
                     return @"Jack's Office";
-                if (map.Contains("laser"))
+                if (map.StartsWith("laser"))
                     return "Lunar Launching Station";
-                if (map.Contains("meriff"))
+                if (map.StartsWith("meriff"))
                     return @"Meriff's Office";
-                if (map.Contains("digsite_rk5"))
+                if (map.StartsWith("digsite_rk5"))
                     return "Outfall Pumping Station";
-                if (map.Contains("outlands_combat2"))
+                if (map.StartsWith("outlands_combat2"))
                     return "Outlands Canyon";
-                if (map.Contains("outlands"))
+                if (map.StartsWith("outlands"))
                     return "Outlands Spur";
-                if (map.Contains("wreck"))
+                if (map.StartsWith("wreck"))
                     return @"Pity's Fall";
-                if (map.Contains("deadsurface"))
+                if (map.StartsWith("deadsurface"))
                     return "Regolith Range";
-                if (map.Contains("randdfacility"))
+                if (map.StartsWith("randdfacility"))
                     return "Research and Development";
-                if (map.Contains("moonsurface"))
+                if (map.StartsWith("moonsurface"))
                     return @"Serenity's Waste";
-                if (map.Contains("stantonsliver"))
+                if (map.StartsWith("stantonsliver"))
                     return @"Stanton's Liver";
-                if (map.Contains("sublevel13"))
+                if (map.StartsWith("sublevel13"))
                     return "Sub-Level 13";
-                if (map.Contains("dahlfactory") && !map.Contains("boss"))
+                if (map.StartsWith("dahlfactory"))
+                {
+                    if (map.Contains("boss"))
+                        return "Titan Robot Production Plant";
                     return "Titan Industrial Facility";
-                if (map.Contains("dahlfactory_boss"))
-                    return "Titan Robot Production Plant";
-                if (map.Contains("moon"))
+                }
+                if (map.StartsWith("moon"))
                     return "Triton Flats";
-                if (map.Contains("access"))
+                if (map.StartsWith("access"))
                     return @"Tycho's Ribs";
-                if (map.Contains("innerhull"))
+                if (map.StartsWith("innerhull"))
                     return "Veins of Helios";
-                if (map.Contains("digsite"))
+                if (map.StartsWith("digsite"))
                     return "Vorago Solitude";
 
-                if (map.Contains("moonslaughter"))
+                if (map.StartsWith("moonslaughter"))
                     return "Abandoned Training Facility";
-                if (map.Contains("eridian_slaughter"))
+                if (map.StartsWith("eridian_slaughter"))
                     return "The Holodome";
             }
 
