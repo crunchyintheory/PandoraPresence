@@ -81,10 +81,11 @@ namespace BorderlandsDiscordRP
                 return 1;
             }
 
-            var process = Process.Start(Path.Combine(dir, game));
-            setupClient();
+            Process process = Process.Start(Path.Combine(dir, game));
+            Thread child = setupClient();
             process.WaitForExit();
             client.ClearPresence();
+            child.Abort();
 
             //Testing Code
             //ManualResetEvent Wait = new ManualResetEvent(false);
@@ -95,7 +96,7 @@ namespace BorderlandsDiscordRP
         #endregion
 
         #region Setup 
-        private static void setupClient()
+        private static Thread setupClient()
         {
             connected = false;
 
@@ -126,6 +127,8 @@ namespace BorderlandsDiscordRP
             childThread.Start();
             while (childThread.IsAlive)
                 continue;
+
+            return childThread;
 
         }
 
@@ -414,7 +417,7 @@ namespace BorderlandsDiscordRP
                     return "Wam Bam Island";
                 #endregion
                 #region Lilith
-                if (map.StartsWith("sanctintro"))
+                if (map.StartsWith("sanctintro") || map.StartsWith("gaiussanctuary"))
                     return "Sanctuary";
                 if (map.StartsWith("backburner"))
                     return "The Backburner";
