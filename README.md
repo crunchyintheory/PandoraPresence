@@ -22,7 +22,7 @@ Information like:
 * Number of players in the lobby
 * How long you've been playing
 
-![Borderlands 2](https://i.imgur.com/6uqNnGy.png)
+![Borderlands 2](https://i.imgur.com/0uaaFz7.png)
 ![Borderlands: The Pre-Sequel](https://i.imgur.com/I9axsyJ.png)
 <br>
 
