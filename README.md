@@ -22,8 +22,8 @@ Information like:
 * Number of players in the lobby
 * How long you've been playing
 
-![Borderlands 2](https://i.imgur.com/0uaaFz7.png)
-![Borderlands: The Pre-Sequel](https://i.imgur.com/I9axsyJ.png)
+![Borderlands 2](https://github.com/crunchyintheory/pandorapresence/blob/master/docs/bl2.png)
+![Borderlands: The Pre-Sequel](https://github.com/crunchyintheory/pandorapresence/blob/master/docs/bltps.png)
 <br>
 
 Installation
