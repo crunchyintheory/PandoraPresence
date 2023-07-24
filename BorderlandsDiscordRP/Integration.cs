@@ -81,7 +81,10 @@ namespace BorderlandsDiscordRP
                 return 1;
             }
 
-            Process process = Process.Start(Path.Combine(dir, game));
+            string[] args = Environment.GetCommandLineArgs();
+            string argLine = string.Join(" ", args.Skip(1));
+
+            Process process = Process.Start(Path.Combine(dir, game), argLine);
             Thread child = setupClient();
             process.WaitForExit();
             client.ClearPresence();
