@@ -1,58 +1,60 @@
 ﻿using System;
-using System.Timers;
-using System.Diagnostics;
-using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Timers;
 using BorderlandsDiscordRP.Properties;
 using DiscordRPC;
 using DiscordRPC.Logging;
 using static BLIO;
-using System.Text.RegularExpressions;
-using System.IO;
+using Timer = System.Timers.Timer;
 
 namespace BorderlandsDiscordRP
 {
-    class Integration
+    internal static class Integration
     {
 
         #region Variables
 
         #region Discord Specific Things
         // The discord client
-        public static DiscordRpcClient client;
+        private static DiscordRpcClient _client = null!;
 
         // The pipe discord is located on. If set to -1, the client will scan for the first available pipe.
-        private static int discordPipe = -1;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
+        public static int DiscordPipe = -1;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
 
         // The ID of the client using Discord RP.
-        private static string bl2ClientID = Settings.Default.bl2ClientID;
-        private static string tpsClientID = Settings.Default.tpsClientId;
+        private static readonly string Bl2ClientId = Settings.Default.bl2ClientID;
+        private static readonly string TpsClientId = Settings.Default.tpsClientId;
 
         // The double (in milliseconds) for how much we update
-        private static double timeToUpdate = Settings.Default.timeUpdate;
+        private static readonly double TimeToUpdate = Settings.Default.timeUpdate;
 
         // The level of logging to use
-        private static LogLevel logLevel = LogLevel.Warning;
+        private const LogLevel LogLevel = DiscordRPC.Logging.LogLevel.Warning;
 
         // The timer we use to update our discord rpc
-        private static System.Timers.Timer timer = new System.Timers.Timer(15000);
+        private static readonly Timer Timer = new Timer(15000);
 
         // If we're connected to discord
-        private static bool connected = false;
+        private static bool _connected;
 
         #endregion
 
         #region Game Specific Stuff
-        // The boolean of the game
-        private static bool bl2 = true;
-        private static bool tps = false;
+        // The boolean value of the game
+        private static bool _bl2 = true;
+        private static bool _tps;
 
-        private static string lastKnownMap = "The Borderlands";
-        private static string lastKnownMission = "In Menu";
-        private static string lastKnownChar = "Unknown";
-        private static int lastKnownLevel = 0;
+        private static string _lastKnownMap = "The Borderlands";
+        private static string _lastKnownChar = "Unknown";
+        private static int _lastKnownLevel;
         #endregion
 
         #endregion
@@ -84,10 +86,10 @@ namespace BorderlandsDiscordRP
             string[] args = Environment.GetCommandLineArgs();
             string argLine = string.Join(" ", args.Skip(1));
 
-            Process process = Process.Start(Path.Combine(dir, game), argLine);
-            Thread child = setupClient();
+            Process process = Process.Start(Path.Combine(dir, game), argLine) ?? throw new InvalidOperationException();
+            Thread child = Integration.SetupClient();
             process.WaitForExit();
-            client.ClearPresence();
+            Integration._client.ClearPresence();
             child.Abort();
 
             //Testing Code
@@ -99,45 +101,46 @@ namespace BorderlandsDiscordRP
         #endregion
 
         #region Setup 
-        private static Thread setupClient()
+        private static Thread SetupClient()
         {
-            connected = false;
+            Integration._connected = false;
 
-            string clientID = tps ? tpsClientID : bl2ClientID;
+            string clientId = Integration._tps ? Integration.TpsClientId : Integration.Bl2ClientId;
 
             // Create a new client
-            client = new DiscordRpcClient(clientID);
+            Integration._client = new DiscordRpcClient(clientId);
 
             // Create the logger
-            client.Logger = new ConsoleLogger() { Level = logLevel, Coloured = true };
+            Integration._client.Logger = new ConsoleLogger { Level = Integration.LogLevel, Coloured = true };
 
-            client.OnReady += (sender, msg) =>
+            Integration._client.OnReady += (_, _) =>
             {
-                connected = true;
+                Integration._connected = true;
             };
 
-            timer.Elapsed += timerHandler;
-            timer.AutoReset = true;
-            timer.Interval = 2500;
-            timer.Start();
+            Integration.Timer.Elapsed += Integration.TimerHandler;
+            Integration.Timer.AutoReset = true;
+            Integration.Timer.Interval = 2500;
+            Integration.Timer.Start();
 
 
             // Connect to discord
-            client.Initialize();
+            Integration._client.Initialize();
 
-            Thread childThread = new Thread(CallToChildThread);
+            Thread childThread = new Thread(Integration.CallToChildThread);
 
             childThread.Start();
             while (childThread.IsAlive)
-                continue;
+            {
+            }
 
             return childThread;
 
         }
 
-        public static void CallToChildThread()
+        private static void CallToChildThread()
         {
-            while (!connected)
+            while (!Integration._connected)
             {
                 Thread.Sleep(100);
             }
@@ -145,140 +148,134 @@ namespace BorderlandsDiscordRP
         #endregion
 
         #region Handlers
-        static void timerHandler(object sender, ElapsedEventArgs args)
+
+        private static void TimerHandler(object sender, ElapsedEventArgs args)
         {
             // Change our timer interval just in case.
-            timer.Interval = timeToUpdate;
+            Integration.Timer.Interval = Integration.TimeToUpdate;
 
-            bool lastKnownBl2 = bl2;
-            bool lastKnownTPS = tps;
+            bool lastKnownBl2 = Integration._bl2;
+            bool lastKnownTps = Integration._tps;
 
-            Process[] bl2Array = Process.GetProcesses().Where(p => p.ProcessName.Contains("Borderlands2")).ToArray();
-            Process[] tpsArray = Process.GetProcesses().Where(p => p.ProcessName.Contains("BorderlandsPreSequel")).ToArray();
-            bl2 = bl2Array.Length > 0;
-            tps = tpsArray.Length > 0;
-            var launchDate = new DateTime();
-            if (bl2)
-                launchDate = bl2Array.FirstOrDefault().StartTime;
-            else if (tps)
-                launchDate = tpsArray.FirstOrDefault().StartTime;
+            Process? bl2Process = Process.GetProcesses().FirstOrDefault(p => p.ProcessName.Contains("Borderlands2"));
+            Process? tpsProcess = Process.GetProcesses().FirstOrDefault(p => p.ProcessName.Contains("BorderlandsPreSequel"));
+            DateTime launchDate = new();
+            if (bl2Process != null)
+            {
+                Integration._bl2 = true;
+                launchDate = bl2Process.StartTime;
+            }
+            else if (tpsProcess != null)
+            {
+                Integration._tps = true;
+                launchDate = tpsProcess.StartTime;
+            }
 
             //client.Invoke();
 
 
-            if (!bl2 && !tps)
+            if (!Integration._bl2 && !Integration._tps)
             {
-                client.ClearPresence();
+                Integration._client.ClearPresence();
                 return;
             }
 
-            if (lastKnownBl2 != bl2 || lastKnownTPS != tps)
+            if (lastKnownBl2 != Integration._bl2 || lastKnownTps != Integration._tps)
             {
-                setupClient();
+                Integration.SetupClient();
             }
 
-            int level = getCurrentLevel();
-            string map = getCurrentMap();
+            int level = Integration.GetCurrentLevel();
+            string map = Integration.GetCurrentMap();
 
-            RichPresence presence = new RichPresence()
+            RichPresence presence = new RichPresence
             {
-                Details = getCurrentMission(),
-                State = level > 0 ? string.Format("{1} {0} ({2} of 4)", level, getCurrentClass(), getPlayersInLobby()) : "",
-                Assets = new Assets()
+                Details = Integration.GetCurrentMission(),
+                State = level > 0 ? string.Format("{1} {0} ({2} of 4)", level, Integration.GetCurrentClass(), Integration.GetPlayersInLobby()) : "",
+                Assets = new Assets
                 {
                     LargeImageKey = Regex.Replace(map, @"[ '.\-,/]", "").ToLower(),
                     LargeImageText = map,
                     SmallImageKey = "default",
-                    SmallImageText = bl2 ? "Borderlands 2" : "Borderlands: The Pre-Sequel"
+                    SmallImageText = Integration._bl2 ? "Borderlands 2" : "Borderlands: The Pre-Sequel"
                 },
                 Timestamps = new Timestamps(launchDate.ToUniversalTime())
             };
 
-            client.SetPresence(presence);
+            Integration._client.SetPresence(presence);
         }
         #endregion
 
         #region Data Fetchers
-        private static int getPlayersInLobby()
+        private static int GetPlayersInLobby()
         {
-            int characters = 1;
-            IReadOnlyList<BLObject> players = GetAll("WillowPlayerPawn");
-            players.Distinct().Where(o => o.Name.Contains("Loader."));
-            int count = players.Distinct().Where(o => o.Name.Contains("Loader.")).Count();
-            characters = count != 0 ? count : 1;
+            IReadOnlyList<BLObject> players = BLIO.GetAll("WillowPlayerPawn");
+            //players.Distinct().Where(o => o.Name.Contains("Loader."));
+            int count = players.Distinct().Count(o => o.Name.Contains("Loader."));
+            int characters = count != 0 ? count : 1;
             return characters;
         }
 
-        private static string getCurrentMap()
+        private static string GetCurrentMap()
         {
-            string mapName = "Unknown";
-            IReadOnlyDictionary<BLObject, object> players = GetAll("WorldInfo", "NavigationPointList");
-            KeyValuePair<BLObject, object>[] dict = players.Distinct()
-                .Where(p => p.Key.Name.Contains("Loader.")).ToArray();
+            IReadOnlyDictionary<BLObject, object?> players = BLIO.GetAll("WorldInfo", "NavigationPointList");
+            IEnumerable<KeyValuePair<BLObject, object?>> dict = players.Where(p => p.Key.Name.Contains("Loader."));
 
-            string pylon = "";
-            foreach (KeyValuePair<BLObject, object> kvp in dict)
-            {
-                pylon = ((BLObject)kvp.Value)?.Name;
-            }
-            mapName = mapFileToActualMap(pylon);
-            if (mapName.Trim() == "" || pylon.Contains("Fake"))
-                mapName = lastKnownMap;
+            string pylon = dict.Aggregate("", (current, kvp) => current + (((BLObject?)kvp.Value)?.Name ?? string.Empty));
+            string mapName = Integration.MapFileToActualMap(pylon);
+            if (pylon != null && (mapName.Trim() == "" || pylon.Contains("Fake")))
+                mapName = Integration._lastKnownMap;
             else
-                lastKnownMap = mapName;
+                Integration._lastKnownMap = mapName;
 
             return mapName;
         }
 
-        private static string getCurrentMission()
+        private static string GetCurrentMission()
         {
-            string mission = "Unknown";
-
-            IReadOnlyDictionary<BLObject, object> dict = GetAll("HUDWidget_Missions", "CachedMissionName");
-            KeyValuePair<BLObject, object>[] arr = dict.Where(m => m.Key.Name.Contains("Transient")).ToArray();
-            mission = dict.FirstOrDefault().Value?.ToString();
+            IReadOnlyDictionary<BLObject, object?> dict = BLIO.GetAll("HUDWidget_Missions", "CachedMissionName");
+            //KeyValuePair<BLObject, object>[] arr = dict.Where(m => m.Key.Name.Contains("Transient")).ToArray();
+            string? mission = dict.FirstOrDefault().Value?.ToString();
 
             if (mission == null || mission.Trim() == "")
                 mission = "In Menu";
-            else
-                lastKnownMission = mission;
 
             return mission;
         }
 
-        private static string getCurrentClass()
+        private static string GetCurrentClass()
         {
-            IReadOnlyDictionary<BLObject, object> dict = GetAll("WillowPlayerController", "CharacterClass");
-            KeyValuePair<BLObject, object>[] arr = dict.Where(m => m.Key.Name.Contains("Loader")).ToArray();
-            string characterClass = ((BLObject)arr.FirstOrDefault().Value)?.Name;
+            //IReadOnlyDictionary<BLObject, object> dict = Blio.GetAll("WillowPlayerController", "CharacterClass");
+            //KeyValuePair<BLObject, object>[] arr = dict.Where(m => m.Key.Name.Contains("Loader")).ToArray();
+            string? characterClass = (BLObject.GetPlayerController()?["CharacterClass"] as BLObject)?.Name;
             if (characterClass == null || characterClass.Trim() == "")
-                characterClass = lastKnownChar;
+                characterClass = Integration._lastKnownChar;
             else
-                lastKnownChar = characterClass;
+                Integration._lastKnownChar = characterClass;
 
-            return classToCharacterName(characterClass);
+            return Integration.ClassToCharacterName(characterClass);
         }
 
-        private static int getCurrentLevel()
+        private static int GetCurrentLevel()
         {
 
-            IReadOnlyDictionary<BLObject, object> dict = GetAll("WillowHUDGFxMovie", "CachedLevel");
-            KeyValuePair<BLObject, object>[] arr = dict.Where(m => m.Key.Name.Contains("Transient")).ToArray();
-            string lev = dict.FirstOrDefault().Value?.ToString();
+            IReadOnlyDictionary<BLObject, object?> dict = BLIO.GetAll("WillowHUDGFxMovie", "CachedLevel");
+            //KeyValuePair<BLObject, object?>[] arr = dict.Where(m => m.Key.Name.Contains("Transient")).ToArray();
+            string? lev = dict.FirstOrDefault().Value?.ToString();
 
             if (int.TryParse(lev, out int level) && level != 0)
-                lastKnownLevel = level;
+                Integration._lastKnownLevel = level;
             else
-                level = lastKnownLevel;
+                level = Integration._lastKnownLevel;
             return level;
 
         }
         #endregion
 
         #region Helpers
-        private static string classToCharacterName(string charClass)
+        private static string ClassToCharacterName(string charClass)
         {
-            if (bl2)
+            if (Integration._bl2)
             {
                 if (charClass.Contains("Assassin"))
                     return "Zer0";
@@ -294,7 +291,7 @@ namespace BorderlandsDiscordRP
                     return "Gaige";
             }
 
-            if (tps)
+            else if (Integration._tps)
             {
                 if (charClass.Contains("Crocus"))
                     return "Aurelia";
@@ -313,12 +310,12 @@ namespace BorderlandsDiscordRP
             return "Unknown";
         }
 
-        private static string mapFileToActualMap(string map)
+        private static string MapFileToActualMap(string map)
         {
-            if (map == null)
+            if (map == "")
                 return "Unknown";
             map = map.ToLower(CultureInfo.InvariantCulture);
-            if (bl2)
+            if (Integration._bl2)
             {
                 #region DLC
 
@@ -350,15 +347,13 @@ namespace BorderlandsDiscordRP
                         return "Torgue Arena";
                     if (map.StartsWith("moxxi"))
                         return "Badass Crater Bar";
-                    if (map.StartsWith("hub")) {
-                        if (map[3] == '2')
-                            return "Southern Raceway";
-                        return "Badass Crater of Badassitude";
+                    if (map.StartsWith("hub"))
+                    {
+                        return map[3] == '2' ? "Southern Raceway" : "Badass Crater of Badassitude";
                     }
-                    if (map.StartsWith("dl2")) {
-                        if (map.Contains("interior"))
-                            return @"Pyro Pete's Bar";
-                        return "The Beatdown";
+                    if (map.StartsWith("dl2"))
+                    {
+                        return map.Contains("interior") ? @"Pyro Pete's Bar" : "The Beatdown";
                     }
                     if (map.StartsWith("dl3"))
                         return "The Forge";
@@ -443,9 +438,7 @@ namespace BorderlandsDiscordRP
                     return "Arid Nexus - Boneyard";
                 if (map.StartsWith("dam"))
                 {
-                    if (map.StartsWith("damtop"))
-                        return "Bloodshot Ramparts";
-                    return "Bloodshot Stronghold";
+                    return map.StartsWith("damtop") ? "Bloodshot Ramparts" : "Bloodshot Stronghold";
                 }
                 if (map.StartsWith("frost"))
                     return "Three Horns Valley";
@@ -477,9 +470,7 @@ namespace BorderlandsDiscordRP
                 {
                     if (map.Contains("lynchwood"))
                         return "Lynchwood";
-                    if (map.Contains("cliffs"))
-                        return "Thousand Cuts";
-                    return "Highlands";
+                    return map.Contains("cliffs") ? "Thousand Cuts" : "Highlands";
                 }
                 if (map.StartsWith("luckys"))
                     return "Holy Spirits";
@@ -512,7 +503,7 @@ namespace BorderlandsDiscordRP
                 if (map.StartsWith("glacial"))
                     return "Windshear Waste";
             }
-            else if (tps)
+            else if (Integration._tps)
             {
                 if (map.StartsWith("ma_"))
                 {
@@ -571,9 +562,7 @@ namespace BorderlandsDiscordRP
                     return "Sub-Level 13";
                 if (map.StartsWith("dahlfactory"))
                 {
-                    if (map.Contains("boss"))
-                        return "Titan Robot Production Plant";
-                    return "Titan Industrial Facility";
+                    return map.Contains("boss") ? "Titan Robot Production Plant" : "Titan Industrial Facility";
                 }
                 if (map.StartsWith("moon"))
                     return "Triton Flats";
