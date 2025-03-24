@@ -1,0 +1,3 @@
+[submodule "BLIO"]
+	path = BLIO
+	url = https://github.com/mopioid/BLIO
