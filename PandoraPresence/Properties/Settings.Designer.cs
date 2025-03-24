@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BorderlandsDiscordRP.Properties {
+namespace PandoraPresence.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

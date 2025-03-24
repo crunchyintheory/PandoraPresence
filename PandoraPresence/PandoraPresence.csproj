@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1E88F840-A262-46B1-9E1B-DC8F81E10B12}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>BorderlandsDiscordRP</RootNamespace>
-    <AssemblyName>BorderlandsDiscordRP</AssemblyName>
+    <RootNamespace>PandoraPresence</RootNamespace>
+    <AssemblyName>PandoraPresence</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BorderlandsDiscordRP", "BorderlandsDiscordRP\BorderlandsDiscordRP.csproj", "{1E88F840-A262-46B1-9E1B-DC8F81E10B12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PandoraPresence", "PandoraPresence\PandoraPresence.csproj", "{1E88F840-A262-46B1-9E1B-DC8F81E10B12}"
 	ProjectSection(ProjectDependencies) = postProject
 		{32A70105-2A7E-40C8-9152-46018692DCF9} = {32A70105-2A7E-40C8-9152-46018692DCF9}
 	EndProjectSection

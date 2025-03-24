@@ -7,13 +7,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Timers;
-using BorderlandsDiscordRP.Properties;
 using DiscordRPC;
 using DiscordRPC.Logging;
+using PandoraPresence.Properties;
 using static BLIO;
 using Timer = System.Timers.Timer;
 
-namespace BorderlandsDiscordRP
+namespace PandoraPresence
 {
     internal static class Integration
     {

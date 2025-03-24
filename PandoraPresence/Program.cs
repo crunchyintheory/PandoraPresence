@@ -1,9 +1,9 @@
-﻿using BorderlandsDiscordRP;
+﻿using PandoraPresence;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace BorderlandsDiscordRP
+namespace PandoraPresence
 {
     public static class Program
     {
