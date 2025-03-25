@@ -132,6 +132,7 @@
       <MergeAsm Include="$(OutputPath)$(TargetFileName)" />
       <MergeAsm Include="$(OutputPath)DiscordRPC.dll" />
       <MergeAsm Include="$(OutputPath)Newtonsoft.Json.dll" />
+      <MergeAsm Include="$(OutputPath)BLIO.dll" />
     </ItemGroup>
     <PropertyGroup>
       <MergedAssembly>$(ProjectDir)$(OutDir)Launcher.exe</MergedAssembly>
