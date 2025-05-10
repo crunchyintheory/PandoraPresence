@@ -167,6 +167,7 @@ namespace PandoraPresence
             }
             else if (tpsProcess != null)
             {
+                Integration._bl2 = false;
                 Integration._tps = true;
                 launchDate = tpsProcess.StartTime;
             }
